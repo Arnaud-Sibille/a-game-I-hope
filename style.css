@@ -32,6 +32,7 @@ text-area {
 
 	--WALL-COLOR: #AAA;
 	--OBJECTIVE-COLOR: #8F0;
+	--ENEMY-COLOR: #F55;
 }
 
 table {
@@ -87,5 +88,11 @@ table {
 .objective {
 	background-color: var(--OBJECTIVE-COLOR);
 	position: absolute;
+	display: inline-block;
+}
+
+.ennemy {
+	background-color: var(--ENEMY-COLOR);
+	position:absolute;
 	display: inline-block;
 }

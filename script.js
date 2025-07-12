@@ -1,24 +1,24 @@
 const PX_PER_UNIT = 20;
 const FPS = 60;
-const DELAY_BETWEEN_MOVES = 15;
 
 const gameData = {
     grid: {
-        width: 30,
-        height: 20,
+        width: 31,
+        height: 21,
     },
     player: {
         x: 0,
         y: 0,
         width: 1,
         height: 1,
+        delayBetweenMoves: 15,
         waitTilNextMove: 0,
     },
     objective: {
         x: 29,
         y: 19,
-        width: 1,
-        height: 1,
+        width: 2,
+        height: 2,
     },
     walls: [
         {
@@ -38,6 +38,38 @@ const gameData = {
             height: 8,
         },
     ],
+    ennemies: [
+        {
+            x: 15,
+            y: 10,
+            width: 1,
+            height: 1,
+            deltaX: -1,
+            deltaY: 0,
+            delayBetweenMoves: 30,
+            waitTilNextMove: 0,
+        },
+        {
+            x: 25,
+            y: 14,
+            width: 1,
+            height: 1,
+            deltaX: -1,
+            deltaY: 2,
+            delayBetweenMoves: 30,
+            waitTilNextMove: 0,
+        },
+        {
+            x: 21,
+            y: 6,
+            width: 1,
+            height: 1,
+            deltaX: 3,
+            deltaY: 2,
+            delayBetweenMoves: 30,
+            waitTilNextMove: 0,
+        },
+    ],
 }
 
 const keyData = {
@@ -51,9 +83,37 @@ const keyData = {
     maxPriority: 0,
 }
 
+// --- HELPERS ---
+
 function unitToPxStr(nbUnit, pxPerUnit) {
     return `${nbUnit * pxPerUnit}px`;
 }
+
+function isPointInSegment(x0, x1, width1) {
+    return x0 >= x1 && x0 <= x1 + width1;
+}
+
+function isPointStrictlyInSegment(x0, x1, width1) {
+    return x0 > x1 && x0 < x1 + width1;
+}
+
+function isSegmentinSegment(x1, width1, x2, width2) {
+    return isPointInSegment(x1, x2, width2) && isPointInSegment(x1 + width1, x2, width2);
+}
+
+function doesSegmentOverlapSegment(x1, width1, x2, width2) {
+    return isPointStrictlyInSegment(x1, x2, width2) || isPointStrictlyInSegment(x1 + width1, x2, width2);
+}
+
+function isRectInRect(x1, width1, y1, height1, x2, width2, y2, height2) {
+    return isSegmentinSegment(x1, width1, x2, width2) && isSegmentinSegment(y1, height1, y2, height2);
+}
+
+function doesRectOverlapRect(x1, width1, y1, height1, x2, width2, y2, height2) {
+    return doesSegmentOverlapSegment(x1, width1, x2, width2) && doesSegmentOverlapSegment(y1, height1, y2, height2);
+}
+
+//--- GRAPHICS ---
 
 function drawGrid(parentEl, pxPerUnit, gridData) {
     if (gridData.dom)
@@ -127,11 +187,47 @@ function drawPlayer(parentEl, pxPerUnit, playerData) {
     return playerEl;
 }
 
+function drawEnnemies(parentEl, pxPerUnit, ennemiesData) {
+    for (let ennemyData of ennemiesData) {
+        let ennemyEl = ennemyData.dom;
+        if (!ennemyEl) {
+            ennemyEl = document.createElement("div");
+            ennemyEl.setAttribute("class", "ennemy");
+            ennemyEl.style.width = unitToPxStr(ennemyData.width, pxPerUnit);
+            ennemyEl.style.height = unitToPxStr(ennemyData.height, pxPerUnit);
+            parentEl.appendChild(ennemyEl);
+            ennemyData.dom = ennemyEl;
+        }
+        ennemyEl.style.left = unitToPxStr(ennemyData.x, pxPerUnit);
+        ennemyEl.style.top = unitToPxStr(ennemyData.y, pxPerUnit);
+    }
+}
+
 function drawFrame(gameWrapperSelector, pxPerUnit, gameData) {
     tableEl = drawGrid(document.querySelector(gameWrapperSelector), pxPerUnit, gameData.grid);
     drawObjective(tableEl, pxPerUnit, gameData.objective)
     drawWalls(tableEl, pxPerUnit, gameData.walls);
     drawPlayer(tableEl, pxPerUnit, gameData.player);
+    drawEnnemies(tableEl, pxPerUnit, gameData.ennemies);
+}
+
+// --- MAIN ---
+
+function updateEnnemies(gameData) {
+    for (let ennemy of gameData.ennemies) {
+        if (ennemy.waitTilNextMove > 0) {
+            ennemy.waitTilNextMove--;
+            continue;
+        }
+        if (!isSegmentinSegment(ennemy.x + ennemy.deltaX, ennemy.width, 0, gameData.grid.width))
+            ennemy.deltaX = -ennemy.deltaX;
+        if (!isSegmentinSegment(ennemy.y + ennemy.deltaY, ennemy.height, 0, gameData.grid.height))
+            ennemy.deltaY = -ennemy.deltaY;
+
+        ennemy.x += ennemy.deltaX;
+        ennemy.y += ennemy.deltaY;
+        ennemy.waitTilNextMove = ennemy.delayBetweenMoves;
+    }
 }
 
 function getNewPlayerPos(currentX, currentY, nextCommand) {
@@ -150,29 +246,24 @@ function getNewPlayerPos(currentX, currentY, nextCommand) {
     return [newX, newY];
 }
 
-function isOverlap(x1, y1, width1, height1, x2, y2, width2, height2) {
-    if (x1 + width1 <= x2 || x2 + width2 <= x1)
-        return false;
-    if (y1 + height1 <= y2 || y2 + height2 <= y1)
-        return false;
-
-    return true;
+function isInGrid(x, width, y, height, gridData) {
+    return isRectInRect(x, width, y, height, 0, gridData.width, 0, gridData.height);
 }
 
 function isPlayerPosOk(x, y, gameData) {
-    if (x < 0 || x >= gameData.grid.width || y < 0 || y >= gameData.grid.height)
+    if (!isInGrid(x, gameData.player.width, y, gameData.player.height, gameData.grid))
         return false;
 
     for (let wallData of gameData.walls) {
         const playerData = gameData.player;
-        if (isOverlap(x, y, playerData.width, playerData.height, wallData.x, wallData.y, wallData.width, wallData.height))
+        if (doesRectOverlapRect(x, playerData.width, y, playerData.height, wallData.x, wallData.width, wallData.y, wallData.height))
             return false;
     }
 
     return true;
 }
 
-function updatePlayer(gameData, delayBetweenMoves, nextCommand) {
+function updatePlayer(gameData, nextCommand) {
     const playerData = gameData.player;
 
     if (playerData.waitTilNextMove > 0) {
@@ -192,7 +283,7 @@ function updatePlayer(gameData, delayBetweenMoves, nextCommand) {
 
     playerData.x = newX;
     playerData.y = newY;
-    playerData.waitTilNextMove = delayBetweenMoves;
+    playerData.waitTilNextMove = playerData.delayBetweenMoves;
 }
 
 function figureNextCommand(keyData) {
@@ -212,15 +303,16 @@ function figureNextCommand(keyData) {
     return nextCommand;
 }
 
-function goNextFrame(gameWrapperSelector, pxPerUnit, gameData, delayBetweenMoves, keyData) {
+function goNextFrame(gameWrapperSelector, pxPerUnit, gameData, keyData) {
     const nextCommand = figureNextCommand(keyData);
-    updatePlayer(gameData, delayBetweenMoves, nextCommand);
+    updatePlayer(gameData, nextCommand);
+    updateEnnemies(gameData);
     drawFrame(gameWrapperSelector, pxPerUnit, gameData);
 }
 
 function keyDownEvent(event, keyData) {
     const pressed_key = event.key
-    if (Object.keys(keyData.pressData).includes(pressed_key)) {
+    if (Object.keys(keyData.pressData).includes(pressed_key) && typeof keyData.pressData[pressed_key] !== 'number') {
         keyData.pressData[pressed_key] = keyData.maxPriority++;
         keyData.current = pressed_key;
     }
@@ -236,6 +328,6 @@ function keyUpEvent(event, keyData) {
 window.addEventListener("keydown", (event) => keyDownEvent(event, keyData));
 window.addEventListener("keyup", (event) => keyUpEvent(event, keyData))
 setInterval(
-    () => goNextFrame(".game-display-wrapper", PX_PER_UNIT, gameData, DELAY_BETWEEN_MOVES, keyData),
+    () => goNextFrame(".game-display-wrapper", PX_PER_UNIT, gameData, keyData),
     1 / FPS,
 );
