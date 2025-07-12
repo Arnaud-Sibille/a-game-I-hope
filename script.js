@@ -12,8 +12,6 @@ const gameData = {
         y: 0,
         width: 1,
         height: 1,
-        nextCommand: false,
-        isCommandHolded: false,
         waitTilNextMove: 0,
     },
     objective: {
@@ -40,6 +38,17 @@ const gameData = {
             height: 8,
         },
     ],
+}
+
+const keyData = {
+    pressData: {
+        'ArrowLeft': false,
+        'ArrowRight': false,
+        'ArrowUp': false,
+        'ArrowDown': false,
+    },
+    current: false,
+    maxPriority: 0,
 }
 
 function unitToPxStr(nbUnit, pxPerUnit) {
@@ -163,12 +172,8 @@ function isPlayerPosOk(x, y, gameData) {
     return true;
 }
 
-function updatePlayer(gameData, delayBetweenMoves) {
+function updatePlayer(gameData, delayBetweenMoves, nextCommand) {
     const playerData = gameData.player;
-
-    const nextCommand = playerData.nextCommand;
-    if (!playerData.isCommandHolded)
-        playerData.nextCommand = false;
 
     if (playerData.waitTilNextMove > 0) {
         playerData.waitTilNextMove--;
@@ -190,26 +195,47 @@ function updatePlayer(gameData, delayBetweenMoves) {
     playerData.waitTilNextMove = delayBetweenMoves;
 }
 
-function goNextFrame(gameWrapperSelector, pxPerUnit, gameData, delayBetweenMoves) {
-    updatePlayer(gameData, delayBetweenMoves);
+function figureNextCommand(keyData) {
+    let nextCommand = keyData.current;
+    if (nextCommand && !keyData.pressData[nextCommand])
+        keyData.current = false;
+    else if (!nextCommand) {
+        let currentPriority = -1;
+        Object.entries(keyData.pressData).forEach(([key, value]) => {
+            if (typeof value === 'number' && value > currentPriority) {
+                nextCommand = key;
+                currentPriority = value;
+            }
+        })
+    }
+
+    return nextCommand;
+}
+
+function goNextFrame(gameWrapperSelector, pxPerUnit, gameData, delayBetweenMoves, keyData) {
+    const nextCommand = figureNextCommand(keyData);
+    updatePlayer(gameData, delayBetweenMoves, nextCommand);
     drawFrame(gameWrapperSelector, pxPerUnit, gameData);
 }
 
-function keyDownEvent(event, playerData) {
-    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key))
-        playerData.nextCommand = event.key;
-        playerData.isCommandHolded = true;
-}
-
-function keyUpEvent(event, playerData) {
-    if (event.key === playerData.nextCommand) {
-        playerData.isCommandHolded = false;
+function keyDownEvent(event, keyData) {
+    const pressed_key = event.key
+    if (Object.keys(keyData.pressData).includes(pressed_key)) {
+        keyData.pressData[pressed_key] = keyData.maxPriority++;
+        keyData.current = pressed_key;
     }
 }
 
-window.addEventListener("keydown", (event) => keyDownEvent(event, gameData.player));
-window.addEventListener("keyup", (event) => keyUpEvent(event, gameData.player))
+function keyUpEvent(event, keyData) {
+    const released_key = event.key;
+    if (Object.keys(keyData.pressData).includes(released_key)) {
+        keyData.pressData[released_key] = false;
+    }
+}
+
+window.addEventListener("keydown", (event) => keyDownEvent(event, keyData));
+window.addEventListener("keyup", (event) => keyUpEvent(event, keyData))
 setInterval(
-    () => goNextFrame(".game-display-wrapper", PX_PER_UNIT, gameData, DELAY_BETWEEN_MOVES),
+    () => goNextFrame(".game-display-wrapper", PX_PER_UNIT, gameData, DELAY_BETWEEN_MOVES, keyData),
     1 / FPS,
 );
