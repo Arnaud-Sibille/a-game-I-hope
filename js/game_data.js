@@ -1,0 +1,70 @@
+export const gameData = {
+    grid: {
+        width: 31,
+        height: 21,
+    },
+    player: {
+        x: 0,
+        y: 0,
+        width: 1,
+        height: 1,
+        delayBetweenMoves: 15,
+        waitTilNextMove: 0,
+    },
+    objective: {
+        x: 29,
+        y: 19,
+        width: 2,
+        height: 2,
+    },
+    walls: [
+        {
+            x: 2,
+            y: 1,
+            width: 1,
+            height: 1,
+        }, {
+            x: 5,
+            y: 3,
+            width: 2,
+            height: 2,
+        }, {
+            x: 15,
+            y: 10,
+            width: 5,
+            height: 8,
+        },
+    ],
+    ennemies: [
+        {
+            x: 15,
+            y: 10,
+            width: 1,
+            height: 1,
+            deltaX: -1,
+            deltaY: 0,
+            delayBetweenMoves: 30,
+            waitTilNextMove: 0,
+        },
+        {
+            x: 25,
+            y: 14,
+            width: 1,
+            height: 1,
+            deltaX: -1,
+            deltaY: 2,
+            delayBetweenMoves: 30,
+            waitTilNextMove: 0,
+        },
+        {
+            x: 21,
+            y: 6,
+            width: 1,
+            height: 1,
+            deltaX: 3,
+            deltaY: 2,
+            delayBetweenMoves: 30,
+            waitTilNextMove: 0,
+        },
+    ],
+}
