@@ -1,0 +1,91 @@
+/* --- RESET --- */
+
+*,
+*::before,
+*::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+input,
+button,
+text-area {
+	font: inherit;
+	color: inherit;
+	background-color: inherit;
+}
+
+/* --- VARIABLES --- */
+
+:root {
+	--FF: "Bradley Hand", monospace;
+	--COLOR: #FF8;
+	--BG-COLOR: #333;
+	--BORDER: 1px solid var(--COLOR);
+
+	--WALL-COLOR: #AAA;
+	--OBJECTIVE-COLOR: #8F0;
+}
+
+table {
+	table-layout: fixed;
+	border-spacing: 0;
+	border-left: var(--BORDER);
+	border-top: var(--BORDER);
+}
+
+td {
+	border-bottom: var(--BORDER);
+	border-right: var(--BORDER);
+}
+
+
+/* --- UTILITY --- */
+
+html {
+	font-family: var(--FF);
+	color: var(--COLOR);
+	background-color: var(--BG-COLOR);
+}
+
+h1 {
+	text-align: center;
+	padding: 1rem;
+}
+
+table {
+	position: relative;
+}
+
+/* ------------- */
+
+.game-display-wrapper {
+	padding: 10px;
+	display: flex;
+	justify-content: center;
+}
+
+.player {
+	background-color: var(--COLOR);
+	position: absolute;
+	display: inline-block;
+}
+
+.wall {
+	background-color: var(--WALL-COLOR);
+	position: absolute;
+	display: inline-block;
+}
+
+.objective {
+	background-color: var(--OBJECTIVE-COLOR);
+	position: absolute;
+	display: inline-block;
+}
