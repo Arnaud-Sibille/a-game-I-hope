@@ -18,7 +18,7 @@ addGameInputEvents(keyData);
 
 const intervalID = setInterval(() => {
         goNextFrame(".game-display-wrapper", PX_PER_UNIT, gameData, keyData);
-        if (gameData.status === 'success')
+        if (gameData.status === 'success' || gameData.status === 'failure')
             clearInterval(intervalID);
     },
     1 / FPS,

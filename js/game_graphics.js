@@ -82,15 +82,30 @@ function drawEnnemies(parentEl, pxPerUnit, ennemiesData) {
             ennemyEl.setAttribute("class", "ennemy");
             ennemyEl.style.width = unitToPxStr(ennemyData.width, pxPerUnit);
             ennemyEl.style.height = unitToPxStr(ennemyData.height, pxPerUnit);
+            ennemyEl.style.padding = "2px";
             parentEl.appendChild(ennemyEl);
             ennemyData.dom = ennemyEl;
+
+            const ennemyDrawingEl = document.createElement("div");
+            ennemyDrawingEl.setAttribute("class", "ennemy_drawing");
+            ennemyEl.appendChild(ennemyDrawingEl);
         }
         ennemyEl.style.left = unitToPxStr(ennemyData.x, pxPerUnit);
         ennemyEl.style.top = unitToPxStr(ennemyData.y, pxPerUnit);
     }
 }
 
-function drawSuccess(parentEl, status) {
+function showFailure(parentEl, status) {
+    if (status === 'failure') {
+        const failureEl = document.createElement("h2");
+        failureEl.setAttribute("class", "failure_msg");
+        failureEl.textContent = "Failure.";
+
+        parentEl.appendChild(failureEl);
+    }
+}
+
+function showSuccess(parentEl, status) {
     if (status === 'success') {
         const successEl = document.createElement("h2");
         successEl.setAttribute("class", "success_msg");
@@ -107,5 +122,6 @@ export function drawFrame(gameWrapperSelector, pxPerUnit, gameData) {
     drawWalls(tableEl, pxPerUnit, gameData.walls);
     drawPlayer(tableEl, pxPerUnit, gameData.player);
     drawEnnemies(tableEl, pxPerUnit, gameData.ennemies);
-    drawSuccess(gameWrapperEl, gameData.status);
+    showFailure(gameWrapperEl, gameData.status);
+    showSuccess(gameWrapperEl, gameData.status);
 }

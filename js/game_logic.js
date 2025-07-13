@@ -73,6 +73,17 @@ function updatePlayer(gameData, nextCommand) {
     playerData.waitTilNextMove = playerData.delayBetweenMoves;
 }
 
+function checkLostCondition(gameData) {
+    const player = gameData.player
+    for (let ennemy of gameData.ennemies) {
+        if(doesRectOverlapRect(
+            player.x, player.width, player.y, player.height,
+            ennemy.x, ennemy.width, ennemy.y, ennemy.height
+        ))
+            gameData.status = 'failure';
+    }
+}
+
 function checkWinCondition(gameData) {
     const player = gameData.player;
     const objective = gameData.objective;
@@ -86,5 +97,6 @@ function checkWinCondition(gameData) {
 export function play(gameData, nextCommand) {
     updatePlayer(gameData, nextCommand);
     updateEnnemies(gameData);
+    checkLostCondition(gameData);
     checkWinCondition(gameData);
 }
