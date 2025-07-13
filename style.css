@@ -35,12 +35,6 @@ text-area {
 	--ENEMY-COLOR: #F55;
 }
 
-table {
-	table-layout: fixed;
-	border-spacing: 0;
-	border: var(--BORDER);
-}
-
 /* --- UTILITY --- */
 
 html {
@@ -59,6 +53,9 @@ h2 {
 }
 
 table {
+	table-layout: fixed;
+	border-spacing: 0;
+	border: var(--BORDER);
 	position: relative;
 }
 
