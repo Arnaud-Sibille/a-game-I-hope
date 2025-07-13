@@ -33,17 +33,17 @@ function getNewPlayerPos(currentX, currentY, nextCommand) {
     return [newX, newY];
 }
 
-function isInGrid(x, width, y, height, gridData) {
-    return isRectInRect(x, width, y, height, 0, gridData.width, 0, gridData.height);
+function isInGrid(x, width, y, height, grid) {
+    return isRectInRect(x, width, y, height, 0, grid.width, 0, grid.height);
 }
 
 function isPlayerPosOk(x, y, gameData) {
     if (!isInGrid(x, gameData.player.width, y, gameData.player.height, gameData.grid))
         return false;
 
-    for (let wallData of gameData.walls) {
-        const playerData = gameData.player;
-        if (doesRectOverlapRect(x, playerData.width, y, playerData.height, wallData.x, wallData.width, wallData.y, wallData.height))
+    for (let wall of gameData.walls) {
+        const player = gameData.player;
+        if (doesRectOverlapRect(x, player.width, y, player.height, wall.x, wall.width, wall.y, wall.height))
             return false;
     }
 
@@ -51,26 +51,26 @@ function isPlayerPosOk(x, y, gameData) {
 }
 
 function updatePlayer(gameData, nextCommand) {
-    const playerData = gameData.player;
+    const player = gameData.player;
 
-    if (playerData.waitTilNextMove > 0) {
-        playerData.waitTilNextMove--;
+    if (player.waitTilNextMove > 0) {
+        player.waitTilNextMove--;
         return;
     }
 
     if (!nextCommand)
         return;
 
-    const newPos = getNewPlayerPos(playerData.x, playerData.y, nextCommand);
+    const newPos = getNewPlayerPos(player.x, player.y, nextCommand);
     const newX = newPos[0];
     const newY = newPos[1];
 
     if (!isPlayerPosOk(newX, newY, gameData))
         return;
 
-    playerData.x = newX;
-    playerData.y = newY;
-    playerData.waitTilNextMove = playerData.delayBetweenMoves;
+    player.x = newX;
+    player.y = newY;
+    player.waitTilNextMove = player.delayBetweenMoves;
 }
 
 function checkLostCondition(gameData) {

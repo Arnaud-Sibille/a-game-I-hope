@@ -1,16 +1,16 @@
 import { unitToPxStr } from "./utils.js";
 
-function drawGrid(parentEl, pxPerUnit, gridData) {
-    if (gridData.dom)
-        return gridData.dom;
+function drawGrid(parentEl, pxPerUnit, grid) {
+    if (grid.dom)
+        return grid.dom;
 
     const tableEl = document.createElement("table");
-    tableEl.style.width = unitToPxStr(gridData.width, pxPerUnit);
-    tableEl.style.height = unitToPxStr(gridData.height, pxPerUnit);
-    for (let y = 0; y < gridData.height; y++) {
+    tableEl.style.width = unitToPxStr(grid.width, pxPerUnit);
+    tableEl.style.height = unitToPxStr(grid.height, pxPerUnit);
+    for (let y = 0; y < grid.height; y++) {
         const rowEl = document.createElement("tr");
         tableEl.appendChild(rowEl);
-        for (let x = 0; x < gridData.width; x++) {
+        for (let x = 0; x < grid.width; x++) {
             const cellEl = document.createElement("td");
             cellEl.style.width = unitToPxStr(1, pxPerUnit);
             cellEl.style.height = unitToPxStr(1, pxPerUnit);
@@ -18,80 +18,80 @@ function drawGrid(parentEl, pxPerUnit, gridData) {
         }
     }
     parentEl.appendChild(tableEl);
-    gridData.dom = tableEl;
+    grid.dom = tableEl;
 
     return tableEl;
 }
 
-function drawObjective(parentEl, pxPerUnit, objectiveData) {
-    if (objectiveData.dom)
-        return objectiveData.dom;
+function drawObjective(parentEl, pxPerUnit, objective) {
+    if (objective.dom)
+        return objective.dom;
 
     const objectiveEl = document.createElement("div");
     objectiveEl.setAttribute("class", "objective");
-    objectiveEl.style.left = unitToPxStr(objectiveData.x, pxPerUnit);
-    objectiveEl.style.top = unitToPxStr(objectiveData.y, pxPerUnit);
-    objectiveEl.style.width = unitToPxStr(objectiveData.width, pxPerUnit);
-    objectiveEl.style.height = unitToPxStr(objectiveData.height, pxPerUnit);
+    objectiveEl.style.left = unitToPxStr(objective.x, pxPerUnit);
+    objectiveEl.style.top = unitToPxStr(objective.y, pxPerUnit);
+    objectiveEl.style.width = unitToPxStr(objective.width, pxPerUnit);
+    objectiveEl.style.height = unitToPxStr(objective.height, pxPerUnit);
     parentEl.appendChild(objectiveEl);
 
-    objectiveData.dom = objectiveEl;
+    objective.dom = objectiveEl;
 
     return objectiveEl;
 }
 
-function drawWalls(parentEl, pxPerUnit, wallsData) {
-    for (let wallData of wallsData) {
-        if (wallData.dom)
+function drawWalls(parentEl, pxPerUnit, walls) {
+    for (let wall of walls) {
+        if (wall.dom)
             continue;
 
         const wallEl = document.createElement("div");
 
         wallEl.setAttribute("class", "wall");
-        wallEl.style.left = unitToPxStr(wallData.x, pxPerUnit);
-        wallEl.style.top = unitToPxStr(wallData.y, pxPerUnit);
-        wallEl.style.width = unitToPxStr(wallData.width, pxPerUnit);
-        wallEl.style.height = unitToPxStr(wallData.height, pxPerUnit);
+        wallEl.style.left = unitToPxStr(wall.x, pxPerUnit);
+        wallEl.style.top = unitToPxStr(wall.y, pxPerUnit);
+        wallEl.style.width = unitToPxStr(wall.width, pxPerUnit);
+        wallEl.style.height = unitToPxStr(wall.height, pxPerUnit);
         parentEl.appendChild(wallEl);
 
-        wallData.dom = wallEl;
+        wall.dom = wallEl;
     }
 }
 
-function drawPlayer(parentEl, pxPerUnit, playerData) {
-    let playerEl = playerData.dom;
+function drawPlayer(parentEl, pxPerUnit, player) {
+    let playerEl = player.dom;
     if (!playerEl) {
         playerEl = document.createElement("div");
         playerEl.setAttribute("class", "player");
-        playerEl.style.width = unitToPxStr(playerData.width, pxPerUnit);
-        playerEl.style.height = unitToPxStr(playerData.height, pxPerUnit);
+        playerEl.style.width = unitToPxStr(player.width, pxPerUnit);
+        playerEl.style.height = unitToPxStr(player.height, pxPerUnit);
         parentEl.appendChild(playerEl);
-        playerData.dom = playerEl;
+        player.dom = playerEl;
     }
-    playerEl.style.left = unitToPxStr(playerData.x, pxPerUnit);
-    playerEl.style.top = unitToPxStr(playerData.y, pxPerUnit);
+    playerEl.style.left = unitToPxStr(player.x, pxPerUnit);
+    playerEl.style.top = unitToPxStr(player.y, pxPerUnit);
 
     return playerEl;
 }
 
-function drawEnnemies(parentEl, pxPerUnit, ennemiesData) {
-    for (let ennemyData of ennemiesData) {
-        let ennemyEl = ennemyData.dom;
+function drawEnnemies(parentEl, pxPerUnit, ennemies) {
+    for (let ennemy of ennemies) {
+        let ennemyEl = ennemy.dom;
         if (!ennemyEl) {
             ennemyEl = document.createElement("div");
             ennemyEl.setAttribute("class", "ennemy");
-            ennemyEl.style.width = unitToPxStr(ennemyData.width, pxPerUnit);
-            ennemyEl.style.height = unitToPxStr(ennemyData.height, pxPerUnit);
+            ennemyEl.style.width = unitToPxStr(ennemy.width, pxPerUnit);
+            ennemyEl.style.height = unitToPxStr(ennemy.height, pxPerUnit);
             ennemyEl.style.padding = "2px";
             parentEl.appendChild(ennemyEl);
-            ennemyData.dom = ennemyEl;
+            ennemy.dom = ennemyEl;
 
             const ennemyDrawingEl = document.createElement("div");
             ennemyDrawingEl.setAttribute("class", "ennemy_drawing");
             ennemyEl.appendChild(ennemyDrawingEl);
         }
-        ennemyEl.style.left = unitToPxStr(ennemyData.x, pxPerUnit);
-        ennemyEl.style.top = unitToPxStr(ennemyData.y, pxPerUnit);
+        ennemyEl.style.left = unitToPxStr(ennemy.x, pxPerUnit);
+        ennemyEl.style.top = unitToPxStr(ennemy.y, pxPerUnit);
     }
 }
 
