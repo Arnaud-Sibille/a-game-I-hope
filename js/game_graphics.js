@@ -5,13 +5,15 @@ function drawGrid(parentEl, pxPerUnit, gridData) {
         return gridData.dom;
 
     const tableEl = document.createElement("table");
+    tableEl.style.width = unitToPxStr(gridData.width, pxPerUnit);
+    tableEl.style.height = unitToPxStr(gridData.height, pxPerUnit);
     for (let y = 0; y < gridData.height; y++) {
         const rowEl = document.createElement("tr");
         tableEl.appendChild(rowEl);
         for (let x = 0; x < gridData.width; x++) {
             const cellEl = document.createElement("td");
-            cellEl.width = unitToPxStr(1, pxPerUnit);
-            cellEl.height = unitToPxStr(1, pxPerUnit);
+            cellEl.style.width = unitToPxStr(1, pxPerUnit);
+            cellEl.style.height = unitToPxStr(1, pxPerUnit);
             rowEl.appendChild(cellEl);
         }
     }
@@ -88,10 +90,22 @@ function drawEnnemies(parentEl, pxPerUnit, ennemiesData) {
     }
 }
 
+function drawSuccess(parentEl, status) {
+    if (status === 'success') {
+        const successEl = document.createElement("h2");
+        successEl.setAttribute("class", "success_msg");
+        successEl.textContent = "Success!";
+
+        parentEl.appendChild(successEl);
+    }
+}
+
 export function drawFrame(gameWrapperSelector, pxPerUnit, gameData) {
-    const tableEl = drawGrid(document.querySelector(gameWrapperSelector), pxPerUnit, gameData.grid);
-    drawObjective(tableEl, pxPerUnit, gameData.objective)
+    const gameWrapperEl = document.querySelector(gameWrapperSelector);
+    const tableEl = drawGrid(gameWrapperEl, pxPerUnit, gameData.grid);
+    drawObjective(tableEl, pxPerUnit, gameData.objective);
     drawWalls(tableEl, pxPerUnit, gameData.walls);
     drawPlayer(tableEl, pxPerUnit, gameData.player);
     drawEnnemies(tableEl, pxPerUnit, gameData.ennemies);
+    drawSuccess(gameWrapperEl, gameData.status);
 }

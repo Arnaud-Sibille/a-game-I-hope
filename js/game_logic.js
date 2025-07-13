@@ -1,6 +1,6 @@
 import { isSegmentinSegment, isRectInRect, doesRectOverlapRect } from "./utils.js";
 
-export function updateEnnemies(gameData) {
+function updateEnnemies(gameData) {
     for (let ennemy of gameData.ennemies) {
         if (ennemy.waitTilNextMove > 0) {
             ennemy.waitTilNextMove--;
@@ -50,7 +50,7 @@ function isPlayerPosOk(x, y, gameData) {
     return true;
 }
 
-export function updatePlayer(gameData, nextCommand) {
+function updatePlayer(gameData, nextCommand) {
     const playerData = gameData.player;
 
     if (playerData.waitTilNextMove > 0) {
@@ -71,4 +71,20 @@ export function updatePlayer(gameData, nextCommand) {
     playerData.x = newX;
     playerData.y = newY;
     playerData.waitTilNextMove = playerData.delayBetweenMoves;
+}
+
+function checkWinCondition(gameData) {
+    const player = gameData.player;
+    const objective = gameData.objective;
+    if (isRectInRect(
+        player.x, player.width, player.y, player.height,
+        objective.x, objective.width, objective.y, objective.height
+    ))
+        gameData.status = 'success';
+}
+
+export function play(gameData, nextCommand) {
+    updatePlayer(gameData, nextCommand);
+    updateEnnemies(gameData);
+    checkWinCondition(gameData);
 }
